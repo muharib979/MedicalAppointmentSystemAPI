@@ -1,4 +1,7 @@
-﻿using MedicalAppointmentSystem.Infrastructure.Persistence.Context;
+﻿using Core.Application.Commands;
+using Core.Application.Interfaces;
+using MedicalAppointmentSystem.Infrastructure.Persistence.Context;
+using MedicalAppointmentSystem.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +19,11 @@ namespace MedicalAppointmentSystem.Infrastructure.DependencyInjection
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddMediatR(cfg =>
+                cfg.RegisterServicesFromAssemblyContaining<CreateAppointmentCommand>());
+
         }
     }
 }
