@@ -215,6 +215,55 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
 
             return appointmentList;
         }
+
+        public async Task<List<PatientDto>> GetPatientsAsync()
+        {
+            await using var con = new SqlConnection(_connectionString);
+
+            const string sql = @"
+        SELECT 
+            Patient_Id AS PatientId, 
+            Full_Name AS FullName, 
+            DateOfBirth, 
+            Gender, 
+            Contact_Number AS ContactNumber, 
+            Address 
+        FROM Patients";
+
+            var result = await con.QueryAsync<PatientDto>(sql);
+            return result.ToList();
+        }
+
+        public async Task<List<DoctorDto>> GetDoctorsAsync()
+        {
+            const string sql = @"
+            SELECT 
+                Doctor_Id AS DoctorId,
+                Full_Name AS FullName,
+                Specialization,
+                Contact_Number AS ContactNumber
+            FROM Doctors";
+
+            await using var con = new SqlConnection(_connectionString);
+            var result = await con.QueryAsync<DoctorDto>(sql);
+            return result.ToList();
+        }
+
+
+        public async Task<List<MedicineDto>> GetMedicinesAsync()
+        {
+            const string sql = @"
+            SELECT 
+                Medicine_Id AS MedicineId,
+                Name,
+                Description
+            FROM Medicines";
+
+            await using var con = new SqlConnection(_connectionString);
+            var result = await con.QueryAsync<MedicineDto>(sql);
+            return result.ToList();
+        }
+
     }
 
 }

@@ -11,6 +11,16 @@ namespace MedicalAppointmentSystem.API
 
             builder.Services.AddControllers();
              builder.Services.AddRepositoryServices(builder.Configuration);
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AppointmentApp",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:4200")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
+            });
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             //builder.Services.AddOpenApi();
             builder.Services.AddSwaggerGen();
@@ -25,7 +35,7 @@ namespace MedicalAppointmentSystem.API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("AppointmentApp");
             app.UseAuthorization();
 
 

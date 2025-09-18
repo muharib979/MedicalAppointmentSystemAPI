@@ -55,6 +55,27 @@ namespace MedicalAppointmentSystem.API.Controllers
             return Ok(await _mediatr.Send(new GetAppointmentsQuery()));
         }
 
+        [HttpGet("get-all-patients")]
+        public async Task<IActionResult> GetPatients()
+        {
+
+            return Ok(await _mediatr.Send(new GetPatientsQuery()));
+        }
+
+        [HttpGet("get-all-doctors")]
+        public async Task<IActionResult> GetDoctors()
+        {
+
+            return Ok(await _mediatr.Send(new GetDoctorsQuery()));
+        }
+
+        [HttpGet("get-all-medicines")]
+        public async Task<IActionResult> GetMedicines()
+        {
+
+            return Ok(await _mediatr.Send(new GetMedicinesQuery()));
+        }
+
 
 
     }

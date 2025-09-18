@@ -13,5 +13,8 @@ namespace Core.Application.Interfaces
         Task<bool> UpdateAppointmentAsync(int appointmentId,AppointmentDto model);
         Task<bool> DeleteAppointmentAsync(int appointmentId);
         Task<List<AppointmentListDto>> GetAppointmentsAsync();
+        Task<List<PatientDto>> GetPatientsAsync();
+        Task<List<DoctorDto>> GetDoctorsAsync();
+        Task<List<MedicineDto>> GetMedicinesAsync();
     }
 }
