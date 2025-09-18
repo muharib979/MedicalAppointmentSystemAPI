@@ -10,5 +10,8 @@ namespace Core.Application.Interfaces
     public interface IAppointmentRepository
     {
         Task<(bool IsSuccess, int AppointmentId)> SaveAppointmentAsync(AppointmentDto model);
+        Task<bool> UpdateAppointmentAsync(int appointmentId,AppointmentDto model);
+        Task<bool> DeleteAppointmentAsync(int appointmentId);
+        Task<List<AppointmentListDto>> GetAppointmentsAsync();
     }
 }
