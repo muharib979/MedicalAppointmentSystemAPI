@@ -1,5 +1,6 @@
 ﻿using Core.Application.Commands;
 using Core.Application.Interfaces;
+using Core.Application.Services;
 using MedicalAppointmentSystem.Infrastructure.Persistence.Context;
 using MedicalAppointmentSystem.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace MedicalAppointmentSystem.Infrastructure.DependencyInjection
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssemblyContaining<CreateAppointmentCommand>());
 

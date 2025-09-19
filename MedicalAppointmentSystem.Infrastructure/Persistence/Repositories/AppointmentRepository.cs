@@ -1,14 +1,9 @@
 ﻿using Core.Application.Interfaces;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Shared.DTOs;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper;
 
 namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
 {
@@ -171,7 +166,7 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
                     commandType: CommandType.StoredProcedure
                 );
 
-                
+
                 int rows = await con.ExecuteAsync(
                     "SP_DeleteAppointment",
                     param: new { AppointmentId = appointmentId },
@@ -194,7 +189,7 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
             await using var con = new SqlConnection(_connectionString);
             await con.OpenAsync();
 
-        
+
             var appointments = await con.QueryAsync<AppointmentListDto>(
                 "SP_GetAppointments",
                 commandType: CommandType.StoredProcedure
@@ -215,6 +210,34 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
 
             return appointmentList;
         }
+
+        public async Task<AppointmentListDto?> GetAppointmentByIdAsync(int appointmentId)
+        {
+            await using var con = new SqlConnection(_connectionString);
+            await con.OpenAsync();
+
+
+            var appointment = await con.QuerySingleOrDefaultAsync<AppointmentListDto>(
+                "SP_GetAppointmentById",
+                new { AppointmentId = appointmentId },
+                commandType: CommandType.StoredProcedure
+            );
+
+            if (appointment == null)
+                return null;
+
+
+            var prescriptions = await con.QueryAsync<PrescriptionDto>(
+                "SP_GetPrescriptionsByAppointmentId",
+                new { AppointmentId = appointmentId },
+                commandType: CommandType.StoredProcedure
+            );
+
+            appointment.Prescriptions = prescriptions.ToList();
+
+            return appointment;
+        }
+
 
         public async Task<List<PatientDto>> GetPatientsAsync()
         {

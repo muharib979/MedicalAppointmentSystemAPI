@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Shared.DTOs;
+﻿using Shared.DTOs;
 
 namespace Core.Application.Interfaces
 {
@@ -14,6 +9,7 @@ namespace Core.Application.Interfaces
         Task<bool> DeleteAppointmentAsync(int appointmentId);
         Task<List<AppointmentListDto>> GetAppointmentsAsync();
         Task<List<PatientDto>> GetPatientsAsync();
+        Task<AppointmentListDto?> GetAppointmentByIdAsync(int appointmentId);
         Task<List<DoctorDto>> GetDoctorsAsync();
         Task<List<MedicineDto>> GetMedicinesAsync();
     }
