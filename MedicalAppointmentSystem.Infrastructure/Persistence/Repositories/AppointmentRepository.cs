@@ -183,33 +183,46 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
                 throw;
             }
         }
+    
 
-        public async Task<List<AppointmentListDto>> GetAppointmentsAsync()
+        public async Task<PagedResult<AppointmentListDto>> GetAppointmentsAsync(int pageNumber, int pageSize)
         {
             await using var con = new SqlConnection(_connectionString);
             await con.OpenAsync();
 
+            var parameters = new DynamicParameters();
+            parameters.Add("@PageNumber", pageNumber);
+            parameters.Add("@PageSize", pageSize);
 
-            var appointments = await con.QueryAsync<AppointmentListDto>(
+            using var multi = await con.QueryMultipleAsync(
                 "SP_GetAppointments",
+                parameters,
                 commandType: CommandType.StoredProcedure
             );
 
-            var appointmentList = appointments.ToList();
+            var appointments = (await multi.ReadAsync<AppointmentListDto>()).ToList();
+            var totalCount = await multi.ReadSingleAsync<int>();
 
-            foreach (var appointment in appointmentList)
+            foreach (var appointment in appointments)
             {
                 var prescriptions = await con.QueryAsync<PrescriptionDto>(
                     "SP_GetPrescriptionsByAppointmentId",
                     new { AppointmentId = appointment.AppointmentId },
                     commandType: CommandType.StoredProcedure
                 );
-
                 appointment.Prescriptions = prescriptions.ToList();
             }
 
-            return appointmentList;
+            return new PagedResult<AppointmentListDto>
+            {
+                Results = appointments,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
+
+
 
         public async Task<AppointmentListDto?> GetAppointmentByIdAsync(int appointmentId)
         {

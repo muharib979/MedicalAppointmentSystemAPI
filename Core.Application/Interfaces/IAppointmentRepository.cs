@@ -7,7 +7,8 @@ namespace Core.Application.Interfaces
         Task<(bool IsSuccess, int AppointmentId)> SaveAppointmentAsync(AppointmentDto model);
         Task<bool> UpdateAppointmentAsync(int appointmentId,AppointmentDto model);
         Task<bool> DeleteAppointmentAsync(int appointmentId);
-        Task<List<AppointmentListDto>> GetAppointmentsAsync();
+        Task<PagedResult<AppointmentListDto>> GetAppointmentsAsync(int pageNumber, int pageSize);
+
         Task<List<PatientDto>> GetPatientsAsync();
         Task<AppointmentListDto?> GetAppointmentByIdAsync(int appointmentId);
         Task<List<DoctorDto>> GetDoctorsAsync();

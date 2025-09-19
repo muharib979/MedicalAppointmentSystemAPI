@@ -72,11 +72,11 @@ namespace MedicalAppointmentSystem.API.Controllers
         }
 
         [HttpGet("appointments")]
-        public async Task<IActionResult> GetAppointments()
+        public async Task<IActionResult> GetAppointments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-
-            return Ok(await _mediatr.Send(new GetAppointmentsQuery()));
+            return Ok(await _mediatr.Send(new GetAppointmentsQuery(pageNumber, pageSize)));
         }
+
 
         [HttpGet("appointments/{id}")]
         public async Task<IActionResult> GetAppointmentById(int id)

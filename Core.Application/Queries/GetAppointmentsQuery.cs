@@ -9,20 +9,28 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Queries
 {
-    public class GetAppointmentsQuery : IRequest<List<AppointmentListDto>>
+    public class GetAppointmentsQuery : IRequest<PagedResult<AppointmentListDto>>
     {
+        public int PageNumber { get; }
+        public int PageSize { get; }
 
-        public class Handler : IRequestHandler<GetAppointmentsQuery, List<AppointmentListDto>>
+        public GetAppointmentsQuery(int pageNumber, int pageSize)
+        {
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+        }
+
+        public class Handler : IRequestHandler<GetAppointmentsQuery, PagedResult<AppointmentListDto>>
         {
             private readonly IAppointmentRepository _repository;
             public Handler(IAppointmentRepository repository)
             {
                 _repository = repository;
             }
-            public async Task<List<AppointmentListDto>> Handle(GetAppointmentsQuery request, CancellationToken cancellationToken)
+
+            public async Task<PagedResult<AppointmentListDto>> Handle(GetAppointmentsQuery request, CancellationToken cancellationToken)
             {
-                var result = await _repository.GetAppointmentsAsync();
-                return result;
+                return await _repository.GetAppointmentsAsync(request.PageNumber, request.PageSize);
             }
         }
     }
