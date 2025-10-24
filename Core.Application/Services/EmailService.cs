@@ -125,16 +125,17 @@ namespace Core.Application.Services
                 doc.Add(new Paragraph($"Doctor: {appointment.DoctorName}", normalFont));
                 doc.Add(new Paragraph($"Visit Type: {appointment.VisitType}", normalFont));
                 doc.Add(new Paragraph($"Diagnosis: {appointment.Diagnosis}", normalFont));
-                doc.Add(new Paragraph($"Notes: {appointment.Notes}", normalFont));
+                //doc.Add(new Paragraph($"Notes: {appointment.Notes}", normalFont));
                 doc.Add(new Paragraph(" "));
 
                 // Prescription Table
-                PdfPTable table = new PdfPTable(4);
+                PdfPTable table = new PdfPTable(5);
                 table.WidthPercentage = 100;
                 table.AddCell("Medicine");
                 table.AddCell("Dosage");
                 table.AddCell("Start Date");
                 table.AddCell("End Date");
+                table.AddCell("Notes");
 
                 foreach (var p in appointment.Prescriptions)
                 {
@@ -142,6 +143,7 @@ namespace Core.Application.Services
                     table.AddCell(p.Dosage);
                     table.AddCell(p.StartDate.ToString("dd-MMM-yyyy"));
                     table.AddCell(p.EndDate.ToString("dd-MMM-yyyy"));
+                    table.AddCell(p.Notes);
                 }
 
                 doc.Add(table);

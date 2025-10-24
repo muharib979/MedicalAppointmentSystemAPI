@@ -183,9 +183,46 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
                 throw;
             }
         }
-    
 
-        public async Task<PagedResult<AppointmentListDto>> GetAppointmentsAsync(int pageNumber, int pageSize)
+
+        //public async Task<PagedResult<AppointmentListDto>> GetAppointmentsAsync(int pageNumber, int pageSize)
+        //{
+        //    await using var con = new SqlConnection(_connectionString);
+        //    await con.OpenAsync();
+
+        //    var parameters = new DynamicParameters();
+        //    parameters.Add("@PageNumber", pageNumber);
+        //    parameters.Add("@PageSize", pageSize);
+
+        //    using var multi = await con.QueryMultipleAsync(
+        //        "SP_GetAppointments",
+        //        parameters,
+        //        commandType: CommandType.StoredProcedure
+        //    );
+
+        //    var appointments = (await multi.ReadAsync<AppointmentListDto>()).ToList();
+        //    var totalCount = await multi.ReadSingleAsync<int>();
+
+        //    foreach (var appointment in appointments)
+        //    {
+        //        var prescriptions = await con.QueryAsync<PrescriptionDto>(
+        //            "SP_GetPrescriptionsByAppointmentId",
+        //            new { AppointmentId = appointment.AppointmentId },
+        //            commandType: CommandType.StoredProcedure
+        //        );
+        //        appointment.Prescriptions = prescriptions.ToList();
+        //    }
+
+        //    return new PagedResult<AppointmentListDto>
+        //    {
+        //        Results = appointments,
+        //        TotalCount = totalCount,
+        //        PageNumber = pageNumber,
+        //        PageSize = pageSize
+        //    };
+        //}
+
+        public async Task<PagedResult<AppointmentListDto>> GetAppointmentsAsync(int pageNumber, int pageSize, string role, string? contactNumber)
         {
             await using var con = new SqlConnection(_connectionString);
             await con.OpenAsync();
@@ -193,6 +230,8 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
             var parameters = new DynamicParameters();
             parameters.Add("@PageNumber", pageNumber);
             parameters.Add("@PageSize", pageSize);
+            parameters.Add("@Role", role);
+            parameters.Add("@ContactNumber", contactNumber);
 
             using var multi = await con.QueryMultipleAsync(
                 "SP_GetAppointments",
@@ -221,6 +260,7 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
                 PageSize = pageSize
             };
         }
+
 
 
 
@@ -277,7 +317,8 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
                 Doctor_Id AS DoctorId,
                 Full_Name AS FullName,
                 Specialization,
-                Contact_Number AS ContactNumber
+                Contact_Number AS ContactNumber,
+                DepartmentId
             FROM Doctors";
 
             await using var con = new SqlConnection(_connectionString);
@@ -300,6 +341,44 @@ namespace MedicalAppointmentSystem.Infrastructure.Persistence.Repositories
             return result.ToList();
         }
 
+        public async Task<bool> CreateAppointmentAsync(AppointmentSaveDto model)
+        {
+            await using var con = new SqlConnection(_connectionString);
+            await con.OpenAsync();
+
+            var parameters = new
+            {
+                model.FullName,
+                model.DateOfBirth,
+                model.Gender,
+                model.ContactNumber,
+                model.Address,
+                model.PatientEmail,
+                model.DepartmentId,
+                model.DoctorId,
+                model.AppointmentDate,
+                model.Notes
+            };
+
+            var rows = await con.ExecuteAsync(
+                "SP_SaveAppointmentWithDetails",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return rows > 0;
+        }
+
+        public async Task<List<DepartmentDto>> GetDepartmentAsync()
+        {
+            const string sql = @"
+            SELECT *
+            FROM Department";
+
+            await using var con = new SqlConnection(_connectionString);
+            var result = await con.QueryAsync<DepartmentDto>(sql);
+            return result.ToList();
+        }
     }
 
 }

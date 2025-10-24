@@ -42,6 +42,18 @@ namespace MedicalAppointmentSystem.API.Controllers
             });
         }
 
+        [HttpPost("appointments")]
+        public async Task<IActionResult> CreateAppointment([FromBody] AppointmentSaveDto dto)
+        {
+            var result = await _mediatr.Send(new SaveAppointmentCommand { Model = dto });
+
+            if (result)
+                return Ok(new { message = "Appointment saved successfully!" });
+
+            return BadRequest(new { message = "Failed to save appointment" });
+        }
+
+
         [HttpPut("appointments/{id}")]
         public async Task<IActionResult> UpdateAppointment(int id, [FromBody] AppointmentDto dto)
         {
@@ -53,6 +65,12 @@ namespace MedicalAppointmentSystem.API.Controllers
                 AppointmentId = id,
                 Model = dto
             });
+            var appointment = await _repository.GetAppointmentByIdAsync(id);
+
+            if (appointment == null)
+                return NotFound("Appointment details not found.");
+
+            await _emailService.SendAppointmentEmailAsync(appointment);
 
             return Ok(result);
         }
@@ -71,10 +89,21 @@ namespace MedicalAppointmentSystem.API.Controllers
             return Ok(new { Message = $"Appointment {id} deleted successfully." });
         }
 
+        //[HttpGet("appointments")]
+        //public async Task<IActionResult> GetAppointments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        //{
+        //    return Ok(await _mediatr.Send(new GetAppointmentsQuery(pageNumber, pageSize)));
+        //}
+
         [HttpGet("appointments")]
-        public async Task<IActionResult> GetAppointments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAppointments(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string role = "Admin",
+        [FromQuery] string? contactNumber = null)
         {
-            return Ok(await _mediatr.Send(new GetAppointmentsQuery(pageNumber, pageSize)));
+            var result = await _mediatr.Send(new GetAppointmentsQuery(pageNumber, pageSize, role, contactNumber));
+            return Ok(result);
         }
 
 
@@ -107,6 +136,12 @@ namespace MedicalAppointmentSystem.API.Controllers
         {
 
             return Ok(await _mediatr.Send(new GetMedicinesQuery()));
+        }
+        [HttpGet("get-all-department")]
+        public async Task<IActionResult> GetDepartment()
+        {
+
+            return Ok(await _mediatr.Send(new GetDepartmentQuery()));
         }
 
 

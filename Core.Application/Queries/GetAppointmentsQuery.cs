@@ -13,11 +13,15 @@ namespace Core.Application.Queries
     {
         public int PageNumber { get; }
         public int PageSize { get; }
+        public string Role { get; }
+        public string ContactNumber { get; }
 
-        public GetAppointmentsQuery(int pageNumber, int pageSize)
+        public GetAppointmentsQuery(int pageNumber, int pageSize, string role, string contactNumber)
         {
             PageNumber = pageNumber;
             PageSize = pageSize;
+            Role = role;
+            ContactNumber = contactNumber;
         }
 
         public class Handler : IRequestHandler<GetAppointmentsQuery, PagedResult<AppointmentListDto>>
@@ -30,7 +34,7 @@ namespace Core.Application.Queries
 
             public async Task<PagedResult<AppointmentListDto>> Handle(GetAppointmentsQuery request, CancellationToken cancellationToken)
             {
-                return await _repository.GetAppointmentsAsync(request.PageNumber, request.PageSize);
+                return await _repository.GetAppointmentsAsync(request.PageNumber, request.PageSize,request.Role,request.ContactNumber);
             }
         }
     }

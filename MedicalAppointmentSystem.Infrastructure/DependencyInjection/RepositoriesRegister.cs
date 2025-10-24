@@ -23,6 +23,7 @@ namespace MedicalAppointmentSystem.Infrastructure.DependencyInjection
 
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssemblyContaining<CreateAppointmentCommand>());
 
